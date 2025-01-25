@@ -1,34 +1,20 @@
 #!/usr/bin/node
+const util = require('util');
+const request = util.promisify(require('request'));
+const filmID = process.argv[2];
 
-const axios = require('axios');
+async function starwarsCharacters (filmId) {
+  const endpoint = 'https://swapi-api.hbtn.io/api/films/' + filmId;
+  let response = await (await request(endpoint)).body;
+  response = JSON.parse(response);
+  const characters = response.characters;
 
-async function fetchMovieCharacters(movieId) {
-    const baseUrl = "https://swapi.dev/api/films/";
-
-    try {
-        // Fetch movie details
-        const movieResponse = await axios.get(`${baseUrl}${movieId}/`);
-        const movieData = movieResponse.data;
-
-        // Get the list of character URLs
-        const characters = movieData.characters;
-
-        // Fetch and print each character name
-        for (const characterUrl of characters) {
-            const charResponse = await axios.get(characterUrl);
-            console.log(charResponse.data.name);
-        }
-    } catch (error) {
-        console.error(`Error fetching data: ${error.message}`);
-        process.exit(1);
-    }
+  for (let i = 0; i < characters.length; i++) {
+    const urlCharacter = characters[i];
+    let character = await (await request(urlCharacter)).body;
+    character = JSON.parse(character);
+    console.log(character.name);
+  }
 }
 
-if (process.argv.length !== 3) {
-    console.error("Usage: node star_wars_characters.js <Movie ID>");
-    process.exit(1);
-}
-
-const movieId = process.argv[2];
-fetchMovieCharacters(movieId);
-
+starwarsCharacters(filmID);
