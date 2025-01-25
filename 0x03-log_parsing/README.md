@@ -1,4 +1,5 @@
 Tasks
+
 0. Log parsing
 mandatory
 Score: 0.0% (Checks completed: 0.0%)
